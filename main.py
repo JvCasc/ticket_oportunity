@@ -12,7 +12,7 @@ from notifier import enviar_alerta
 from storage import alerta_ja_enviado, inicializar_banco, registrar_alerta, salvar_precos
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M",
 )
@@ -63,7 +63,6 @@ def main() -> None:
         "=== Monitoramento concluído em %.1fs - %d alerta(s) enviado(s) ===",
         duracao, total_alertas,
     )
-
 
 if __name__ == "__main__":
     main()
