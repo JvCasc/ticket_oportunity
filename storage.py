@@ -13,7 +13,7 @@ db = sqlite3.connect(CAMINHO_BANCO)
 banco = db.cursor()
 
 
-def inicializar_banco() -> None:
+def inicializar_banco():
     """Cria as tabelas do banco de dados, caso ainda não existam."""
     banco.execute(
         """
@@ -54,7 +54,7 @@ def inicializar_banco() -> None:
     logger.info("Banco de dados '%s' inicializado", CAMINHO_BANCO)
 
 
-def salvar_precos(origem: str, destino: str, precos: dict[date, float]) -> None:
+def salvar_precos(origem: str, destino: str, precos: dict[date, float]):
     """Salva no histórico os preços coletados para uma rota."""
     if not precos:
         return
@@ -71,6 +71,7 @@ def salvar_precos(origem: str, destino: str, precos: dict[date, float]) -> None:
         ],
     )
     logger.info("%d preço(s) salvo(s) no histórico para %s -> %s", len(precos), origem, destino)
+    db.commit()
 
 
 def buscar_historico(origem: str, destino: str, data_voo: date) -> list[float]:
@@ -86,6 +87,7 @@ def buscar_historico(origem: str, destino: str, data_voo: date) -> list[float]:
     return [preco for (preco,) in linhas]
 
 
+
 def calcular_media_historica(origem: str, destino: str, data_voo: date) -> tuple[float | None, int]:
     """Calcula a média histórica de preços para a rota e data informadas.
 
@@ -98,7 +100,7 @@ def calcular_media_historica(origem: str, destino: str, data_voo: date) -> tuple
     return sum(historico) / len(historico), len(historico)
 
 
-def registrar_alerta(origem: str, destino: str, data_voo: date, preco: float) -> None:
+def registrar_alerta(origem: str, destino: str, data_voo: date, preco: float):
     """Registra que um alerta foi enviado para a rota, data e preço informados."""
     enviado_em = datetime.now().isoformat(timespec="seconds")
     banco.execute(
@@ -109,7 +111,7 @@ def registrar_alerta(origem: str, destino: str, data_voo: date, preco: float) ->
         (origem, destino, data_voo.isoformat(), preco, enviado_em),
     )
     logger.info("Alerta registrado para %s -> %s em %s (R$ %.2f)", origem, destino, data_voo, preco)
-
+    db.commit()
 
 def alerta_ja_enviado(origem: str, destino: str, data_voo: date, horas: int) -> bool:
     """Verifica se já foi enviado um alerta para a rota e data dentro da janela de horas."""
